@@ -1,15 +1,16 @@
 ### Paper 2 data cleaning
-### 02/07/2022 08:06 PST
+### 06/25/2022 16:35 PDT
 ### Insang Song
 library(pacman)
 p_load(tmap, tmaptools)
 p_load(tidyverse, dtplyr, sf, spdep, rvest)
 # For paper 2 main data: ASMR ####
+username = 'sigma'
 drive = sprintf('/mnt/c/Users/%s/OneDrive/', username)
 source('./Code/Spatial_OR_cleaning_012922.r')
 load('./Data/Tracts_ACS_ORWA_0919_121621.RData')
 load('./Data/ACS_Population_ORWA_012722.RData')
-load('./Data/OR_WA_ACS_sf.RData')
+load('_path_to_/OR_WA_ACS_sf.RData')
 
 
 ## Spatial data filtering ####
@@ -25,7 +26,7 @@ colnames(cw_wa) = crosswalk$`Column Name`
 
 ## Oregon data cleaning ####
 ## Oregon ####
-ord <- read_rds('./Data/Raw/ORD_2006_2019_Raw.rds')
+ord <- read_rds('_path_to_/ORD_2006_2019_Raw.rds')
 
 ord_s <- ord %>% 
 #ord <- ord %>% 
@@ -66,20 +67,31 @@ ord_s <- ord %>%
          mental_new = ifelse(grepl('F[0-4][0-9]', mltcse1) + grepl('F[0-4][0-9]', mltcse2) + grepl('F[0-4][0-9]', mltcse3) + 
                                grepl('F[0-4][0-9]', mltcse4) + grepl('F[0-4][0-9]', mltcse5) + grepl('F[0-4][0-9]', mltcse6) +
                                grepl('F[0-4][0-9]', mltcse7) + grepl('F[0-4][0-9]', mltcse8) + grepl('F[0-4][0-9]', mltcse9) + grepl('F[0-4][0-9]', mltcse10), 1, 0),
+         mental_new2 = ifelse(grepl('F[0-6][0-9]', mltcse1) + grepl('F[0-6][0-9]', mltcse2) + grepl('F[0-6][0-9]', mltcse3) + 
+                               grepl('F[0-6][0-9]', mltcse4) + grepl('F[0-6][0-9]', mltcse5) + grepl('F[0-6][0-9]', mltcse6) +
+                               grepl('F[0-6][0-9]', mltcse7) + grepl('F[0-6][0-9]', mltcse8) + grepl('F[0-6][0-9]', mltcse9) + grepl('F[0-6][0-9]', mltcse10), 1, 0),
          substance = ifelse(grepl('F1[0-9]', mltcse1) + grepl('F1[0-9]', mltcse2) + grepl('F1[0-9]', mltcse3) + 
                                grepl('F1[0-9]', mltcse4) + grepl('F1[0-9]', mltcse5) + grepl('F1[0-9]', mltcse6) +
                                grepl('F1[0-9]', mltcse7) + grepl('F1[0-9]', mltcse8) + grepl('F1[0-9]', mltcse9) + grepl('F1[0-9]', mltcse10), 1, 0),
+         nonsubstance = ifelse(grepl('F[2-4][0-9]', mltcse1) + grepl('F[2-4][0-9]', mltcse2) + grepl('F[2-4][0-9]', mltcse3) + 
+                               grepl('F[2-4][0-9]', mltcse4) + grepl('F[2-4][0-9]', mltcse5) + grepl('F[2-4][0-9]', mltcse6) +
+                               grepl('F[2-4][0-9]', mltcse7) + grepl('F[2-4][0-9]', mltcse8) + grepl('F[2-4][0-9]', mltcse9) + grepl('F[2-4][0-9]', mltcse10), 1, 0),
+         nonsubstance2 = ifelse(grepl('F(0|[2-6])[0-9]', mltcse1) + grepl('F(0|[2-6])[0-9]', mltcse2) + grepl('F(0|[2-6])[0-9]', mltcse3) + 
+                               grepl('F(0|[2-6])[0-9]', mltcse4) + grepl('F(0|[2-6])[0-9]', mltcse5) + grepl('F(0|[2-6])[0-9]', mltcse6) +
+                               grepl('F(0|[2-6])[0-9]', mltcse7) + grepl('F(0|[2-6])[0-9]', mltcse8) + grepl('F(0|[2-6])[0-9]', mltcse9) + grepl('F(0|[2-6])[0-9]', mltcse10), 1, 0),
          moodanxiety = ifelse(grepl('F[3-4][0-9]', mltcse1) + grepl('F[3-4][0-9]', mltcse2) + grepl('F[3-4][0-9]', mltcse3) + 
                                grepl('F[3-4][0-9]', mltcse4) + grepl('F[3-4][0-9]', mltcse5) + grepl('F[3-4][0-9]', mltcse6) +
                                grepl('F[3-4][0-9]', mltcse7) + grepl('F[3-4][0-9]', mltcse8) + grepl('F[3-4][0-9]', mltcse9) + grepl('F[3-4][0-9]', mltcse10), 1, 0),
          parkinson = ifelse(grepl('^(A521|F023|G20|G21|G22|G903).*', mltcse1) | grepl('^(A521|F023|G20|G21|G22|G903).*', mltcse2) | grepl('^(A521|F023|G20|G21|G22|G903).*', mltcse3), 1, 0),
          dementia = ifelse(grepl('^(F00|F01|F02|F03).*', mltcse1) | grepl('^(F00|F01|F02|F03).*', mltcse2) | grepl('^(F00|F01|F02|F03).*', mltcse3), 1, 0),
+         dementia_vascular = ifelse(grepl('F01', mltcse1) + grepl('F01', mltcse2) + grepl('F01', mltcse3) + 
+                               grepl('F01', mltcse4) + grepl('F01', mltcse5) + grepl('F01', mltcse6) +
+                               grepl('F01', mltcse7) + grepl('F01', mltcse8) + grepl('F01', mltcse9) + grepl('F01', mltcse10), 1, 0),
+         dementia_unspecified = ifelse(grepl('F03', mltcse1) + grepl('F03', mltcse2) + grepl('F03', mltcse3) + 
+                               grepl('F03', mltcse4) + grepl('F03', mltcse5) + grepl('F03', mltcse6) +
+                               grepl('F03', mltcse7) + grepl('F03', mltcse8) + grepl('F03', mltcse9) + grepl('F03', mltcse10), 1, 0),
          alzheimer = ifelse(grepl('^(G30).*', mltcse1) | grepl('^(G30).*', mltcse2) | grepl('^(G30).*', mltcse3), 1, 0),
-         #age_f = as.factor(cut(age, c(-Inf, 15, 40, 50, 60, 75, Inf))),
          educ_f = factor(educ),
-         #cbsa = factor(ifelse(is.na(cbsa), 'Rural', 'Urban')),
-         #risk_metal_env = factor(ifelse(is.na(risk_metal_env), 0, risk_metal_env)),
-         #risk_metal_outdoor = factor(ifelse(is.na(risk_metal_outdoor), 0, risk_metal_outdoor)),
          married_f = factor(married),
          smoking_f = factor(smoking),
          race_f = factor(plyr::mapvalues(race, LETTERS[1:8], rep('Others',8)))) %>% 
@@ -88,22 +100,6 @@ ord_s <- ord %>%
          dementia_u = as.integer(ifelse(grepl('^(F00|F01|F02|F03).*', dmcaACME), 1, 0)),
          alzheimer_u = as.integer(ifelse(grepl('^(G30).*', dmcaACME), 1, 0)))
 
-#   mutate(mental = factor(ifelse(grepl('F.*', mltcse1), 'Mental', 'Others')),
-#          mental3 = factor(ifelse(grepl('F.*', mltcse1)+grepl('F.*', mltcse2)+grepl('F.*', mltcse3), 'Mental', 'Others')),
-#          mental_new = ifelse(grepl('F[0-4][0-9]', mltcse1) + grepl('F[0-4][0-9]', mltcse2) + grepl('F[0-4][0-9]', mltcse3) + 
-#                                grepl('F[0-4][0-9]', mltcse4) + grepl('F[0-4][0-9]', mltcse5) + grepl('F[0-4][0-9]', mltcse6) +
-#                                grepl('F[0-4][0-9]', mltcse7) + grepl('F[0-4][0-9]', mltcse8) + grepl('F[0-4][0-9]', mltcse9) + grepl('F[0-4][0-9]', mltcse10), 1, 0),
-#          parkinson = factor(ifelse(grepl('^(A521|F023|G20|G21|G22|G903).*', mltcse1) | grepl('^(A521|F023|G20|G21|G22|G903).*', mltcse2) | grepl('^(A521|F023|G20|G21|G22|G903).*', mltcse3), 'A_Parkinson', 'Others')),
-#          dementia = factor(ifelse(grepl('^(F00|F01|F02|F03).*', mltcse1) | grepl('^(F00|F01|F02|F03).*', mltcse2) | grepl('^(F00|F01|F02|F03).*', mltcse3), 'Dementia', 'Others')),
-#          alzheimer = factor(ifelse(grepl('^(G30).*', mltcse1) | grepl('^(G30).*', mltcse2) | grepl('^(G30).*', mltcse3), 'Alzheimer', 'Others')),
-#          age_f = as.factor(cut(age, c(-Inf, 15, 40, 50, 60, 75, Inf))),
-#          educ_f = factor(educ),
-#          #cbsa = factor(ifelse(is.na(cbsa), 'Rural', 'Urban')),
-#          #risk_metal_env = factor(ifelse(is.na(risk_metal_env), 0, risk_metal_env)),
-#          #risk_metal_outdoor = factor(ifelse(is.na(risk_metal_outdoor), 0, risk_metal_outdoor)),
-#          married_f = factor(married),
-#          smoking_f = factor(smoking),
-#          race_f = factor(plyr::mapvalues(race, LETTERS[1:8], rep('Others',8)))) %>% 
 
 
 
@@ -183,7 +179,6 @@ or_tract_pop_0919_n[[1]] = or_tract_pop_0919_n[[1]] %>%
   mutate(GEOID = as.character(GEOID10)) %>%
   dplyr::select(-GEOID10) %>%
   dplyr::select(GEOID, n_00_10:n_80_Inf)
-# pop_origin00 * pop_pct00 / 100 
 
 
 or_tract_pop_0919_df = or_tract_pop_0919_n %>%
@@ -211,19 +206,11 @@ or_tract_pop_0619_total =
   mutate(tpop = ifelse(is.na(tpop), tpop[which(!is.na(tpop))[1]], tpop)) %>%
   ungroup
 
-# or_tract_pop_0619_total = or_tract_pop_0619_df %>%
-#   filter(year >= 2010) %>%
-#   group_by(GEOID, year) %>%
-#   summarize(tpop = sum(tpop, na.rm = TRUE)) %>%
-#   ungroup %>%
-#   bind_rows(or_tract_pop_0609_total %>% mutate(year = 2006),
-#             or_tract_pop_0609_total %>% mutate(year = 2007),
-#             or_tract_pop_0609_total %>% mutate(year = 2008),
-#             or_tract_pop_0609_total %>% mutate(year = 2009),
-#             .) 
   
-# tract data
-or_tract = tigris::tracts(state = 'OR', year = 2010, refresh = T) %>%
+# tract data (assumption: the working directory points the dissertation base directory)
+or_tract = 
+  st_read("./Data/Basemap/ORWA_Tracts_2010.gpkg") %>%
+  filter(grepl('^41', GEOID10)) %>%
   rmapshaper::ms_simplify(keep = 0.33, keep_shapes = TRUE)
 or_tract_lite = or_tract %>%
   dplyr::select(GEOID10) %>%
@@ -238,11 +225,32 @@ ord_sf_tr_agecounts = ord_sf_tr %>%
   summarize(n_mental1 = sum(mental, na.rm = TRUE),
             n_mental3 = sum(mental3, na.rm = TRUE),
             n_mentaln = sum(mental_new, na.rm = TRUE),
+            n_mentaln2 = sum(mental_new2, na.rm = TRUE),
             n_moodanxiety = sum(moodanxiety, na.rm = TRUE),
-            n_substance = sum(substance, na.rm = TRUE)) %>%
+            n_substance = sum(substance, na.rm = TRUE),
+            n_nonsubstance = sum(nonsubstance, na.rm = TRUE),
+            n_nonsubstance2 = sum(nonsubstance2, na.rm = TRUE),
+            n_dementia_vas = sum(dementia_vascular, na.rm = TRUE),
+            n_dementia_uns = sum(dementia_unspecified, na.rm = TRUE)) %>%
   ungroup %>%
   mutate(agegroup = str_sub(agegroup, 2, nchar(agegroup)-1))
-  #pivot_wider(names_from = agegroup, names_prefix = 'dc', values_from = d_mental)
+ord_sf_tr_summary = ord_sf_tr %>%
+  st_drop_geometry %>%
+  group_by(GEOID10, dth_year) %>%
+  summarize(n_mental1 = sum(mental, na.rm = TRUE),
+            n_mental3 = sum(mental3, na.rm = TRUE),
+            n_mentaln = sum(mental_new, na.rm = TRUE),
+            n_mentaln2 = sum(mental_new2, na.rm = TRUE),
+            n_moodanxiety = sum(moodanxiety, na.rm = TRUE),
+            n_substance = sum(substance, na.rm = TRUE),
+            n_nonsubstance = sum(nonsubstance, na.rm = TRUE),
+            n_nonsubstance2 = sum(nonsubstance2, na.rm = TRUE),
+            n_dementia_vas = sum(dementia_vascular, na.rm = TRUE),
+            n_dementia_uns = sum(dementia_unspecified, na.rm = TRUE),
+            n_meanage_nonsubstance2 = sum(age * nonsubstance2, na.rm = T) / sum(nonsubstance2, na.rm = T),
+            n_meanage_dementia_vas = sum(age * dementia_vascular, na.rm = T) / sum(dementia_vascular, na.rm = T),
+            n_meanage_dementia_uns = sum(age * dementia_unspecified, na.rm = T) / sum(dementia_unspecified, na.rm = T)) %>%
+  ungroup
 
 pop_agestr = tribble(
   ~agegroup,  ~n_all, ~n_male,  ~n_female,  ~newgroup,
@@ -267,10 +275,11 @@ pop_agestr = tribble(
 )
 
 # CPI (from Minneapolis Fed; base 1982-84)
-cpi = rvest::read_html("https://www.minneapolisfed.org/about-us/monetary-policy/inflation-calculator/consumer-price-index-1913-") %>%
-  rvest::html_table() %>%
-  .[[1]] %>%
-  .[,-3]
+# cpi = rvest::read_html("https://www.minneapolisfed.org/about-us/monetary-policy/inflation-calculator/consumer-price-index-1913-") %>%
+#   rvest::html_table() %>%
+#   .[[1]] %>%
+#   .[,-3]
+cpi = read_csv("./Data/CPI_1913_2021.csv")
 cpi_0619 = cpi %>%
   filter(Year %in% 2006:2019) %>%
   mutate(Year = as.integer(Year),
@@ -319,11 +328,6 @@ or_tract_n_gg = ggplot(or_tract_n,
                   geom_line(alpha = 0.3, lwd = 0.66, mapping = aes(group = GEOID)) +
                   stat_summary(geom = 'line', fun = mean, color = 'red', lwd = 1.5)
 
-# or_tract_asmr06 = or_tract %>%
-#   left_join(or_tract_asmr %>% filter(year == 2010),
-#             by = c('GEOID10' = 'GEOID'))
-# plot(or_tract_asmr06 %>% filter(GEOID10 == '41067032300'))
-
 ###
 # composite map
 2006:2019 %>% 
@@ -332,23 +336,6 @@ or_tract_n_gg = ggplot(or_tract_n,
   do.call(rbind, .) -> or_tracts_0619
 or_tracts_0619_md = or_tracts_0619 %>%
   left_join(or_tract_n, by = c('GEOID10' = 'GEOID', 'year' = 'year'))
-# tm_shape(or_tracts_0619_md) +
-#   #tm_style('classic') +
-#   tm_fill('d_mental3', pal = 'Reds') +
-#   tm_borders(lwd = 0.15, col = 'dark grey') +
-#   tm_facets('year') +
-#   tm_layout(inner.margins = 0.01)
-
-
-## TODO: smooth the fluctuation of age-group population in each census tract / no need;
-## TODO: to search the crisp definition of 'zero-inflated data or model'
-## Figure
-# or_tract_asmr_base %>% 
-#   filter(GEOID == unique(GEOID)[835] & year >= 2009) %>%
-#   ggplot(data = .,
-#          mapping = aes(x = year, y = tpop, group = agegroup, color = agegroup)) +
-#   geom_line(lwd = 1.25) -> one_tract_gg
-# ggsave(plot = one_tract_gg, filename = '/mnt/d/tendency_one_tract_013022.png', width = 15, height = 12, units = 'cm', dpi = 300)
 
 
 ## ready-made ACS covariates (00-10 population weighted mean) ####
@@ -376,12 +363,10 @@ or_tract_0619_df =
     or_tract_0919_df)    
 
 
-
-
 ## Washington data cleaning ####
 
 ## Location filtering
-wad = read_rds('./Data/Raw/WAD_DF_111420.rds')
+wad = read_rds('_path_to_/WAD_DF_111420.rds')
 wad_sf = wad %>% 
   filter(!is.na(long) & !is.na(lat)) %>% 
   filter(long < 0 & lat > 40) %>% 
@@ -436,12 +421,27 @@ wad_sf <- wad_sf %>%
          substance = ifelse(grepl('F1[0-9]', mltcse1) + grepl('F1[0-9]', mltcse2) + grepl('F1[0-9]', mltcse3) + 
                                grepl('F1[0-9]', mltcse4) + grepl('F1[0-9]', mltcse5) + grepl('F1[0-9]', mltcse6) +
                                grepl('F1[0-9]', mltcse7) + grepl('F1[0-9]', mltcse8) + grepl('F1[0-9]', mltcse9) + grepl('F1[0-9]', mltcse10), 1, 0),
+         mental_new2 = ifelse(grepl('F[0-6][0-9]', mltcse1) + grepl('F[0-6][0-9]', mltcse2) + grepl('F[0-6][0-9]', mltcse3) + 
+                               grepl('F[0-6][0-9]', mltcse4) + grepl('F[0-6][0-9]', mltcse5) + grepl('F[0-6][0-9]', mltcse6) +
+                               grepl('F[0-6][0-9]', mltcse7) + grepl('F[0-6][0-9]', mltcse8) + grepl('F[0-6][0-9]', mltcse9) + grepl('F[0-6][0-9]', mltcse10), 1, 0),
+         nonsubstance = ifelse(grepl('F[2-4][0-9]', mltcse1) + grepl('F[2-4][0-9]', mltcse2) + grepl('F[2-4][0-9]', mltcse3) + 
+                               grepl('F[2-4][0-9]', mltcse4) + grepl('F[2-4][0-9]', mltcse5) + grepl('F[2-4][0-9]', mltcse6) +
+                               grepl('F[2-4][0-9]', mltcse7) + grepl('F[2-4][0-9]', mltcse8) + grepl('F[2-4][0-9]', mltcse9) + grepl('F[2-4][0-9]', mltcse10), 1, 0),
+         nonsubstance2 = ifelse(grepl('F(0|[2-6])[0-9]', mltcse1) + grepl('F(0|[2-6])[0-9]', mltcse2) + grepl('F(0|[2-6])[0-9]', mltcse3) + 
+                               grepl('F(0|[2-6])[0-9]', mltcse4) + grepl('F(0|[2-6])[0-9]', mltcse5) + grepl('F(0|[2-6])[0-9]', mltcse6) +
+                               grepl('F(0|[2-6])[0-9]', mltcse7) + grepl('F(0|[2-6])[0-9]', mltcse8) + grepl('F(0|[2-6])[0-9]', mltcse9) + grepl('F(0|[2-6])[0-9]', mltcse10), 1, 0),
          moodanxiety = ifelse(grepl('F[3-4][0-9]', mltcse1) + grepl('F[3-4][0-9]', mltcse2) + grepl('F[3-4][0-9]', mltcse3) + 
                                grepl('F[3-4][0-9]', mltcse4) + grepl('F[3-4][0-9]', mltcse5) + grepl('F[3-4][0-9]', mltcse6) +
                                grepl('F[3-4][0-9]', mltcse7) + grepl('F[3-4][0-9]', mltcse8) + grepl('F[3-4][0-9]', mltcse9) + grepl('F[3-4][0-9]', mltcse10), 1, 0),
          mental_new = ifelse(grepl('F[0-4][0-9]', mltcse1) + grepl('F[0-4][0-9]', mltcse2) + grepl('F[0-4][0-9]', mltcse3) + 
                                grepl('F[0-4][0-9]', mltcse4) + grepl('F[0-4][0-9]', mltcse5) + grepl('F[0-4][0-9]', mltcse6) +
-                               grepl('F[0-4][0-9]', mltcse7) + grepl('F[0-4][0-9]', mltcse8) + grepl('F[0-4][0-9]', mltcse9) + grepl('F[0-4][0-9]', mltcse10), 1, 0)) %>%
+                               grepl('F[0-4][0-9]', mltcse7) + grepl('F[0-4][0-9]', mltcse8) + grepl('F[0-4][0-9]', mltcse9) + grepl('F[0-4][0-9]', mltcse10), 1, 0),
+         dementia_vascular = ifelse(grepl('F01', mltcse1) + grepl('F01', mltcse2) + grepl('F01', mltcse3) + 
+                               grepl('F01', mltcse4) + grepl('F01', mltcse5) + grepl('F01', mltcse6) +
+                               grepl('F01', mltcse7) + grepl('F01', mltcse8) + grepl('F01', mltcse9) + grepl('F01', mltcse10), 1, 0),
+         dementia_unspecified = ifelse(grepl('F03', mltcse1) + grepl('F03', mltcse2) + grepl('F03', mltcse3) + 
+                               grepl('F03', mltcse4) + grepl('F03', mltcse5) + grepl('F03', mltcse6) +
+                               grepl('F03', mltcse7) + grepl('F03', mltcse8) + grepl('F03', mltcse9) + grepl('F03', mltcse10), 1, 0)) %>%
   mutate(mental_underly = ifelse(grepl('F.*', underly), 1, 0)) %>% 
   mutate(resdays = case_when(
         resunit %in% c('H', 'N') ~ 1,
@@ -455,15 +455,6 @@ wad_sf <- wad_sf %>%
   mutate(educ = factor(educ),
          race = factor(race),
          sex = factor(sex)) %>%
-  # filter(educ != '99' & !married %in% c('P','A','U') & educ != '9' & race != '9' & sex != 'U') %>% 
-#   filter(!smoking %in% c('C','U') & !is.na(smoking)) %>% 
-#   mutate(sex = factor(sex, levels = c('M', 'F'), labels = c('Male', 'Female')),
-#          educ = factor(educ, levels = 1:8, labels = c('<9yr', '9-12', 'HSdiploma', 'CollegeNoD', 'Associate', 'Bachelors', 'Masters', 'PhD/Professional')),
-#          race = factor(race, levels = 1:4, labels = c('White', 'Black', 'Hispanic', 'Others')),
-#          married = factor(married, levels = c('M', 'S','W','D'), labels = c('Married', 'Never married', 'Widowed', 'Divorced')),
-#          smoking = factor(smoking, levels = c('Y', 'N', 'P'), labels = c('Yes', 'No', 'Paused'))) %>% 
-#   filter(resdays >= 365) %>% 
-  #as_tibble %>% 
   mutate_if(is.factor, droplevels) 
 
 
@@ -523,7 +514,6 @@ wa_tract_pop_0919_n[[1]] = wa_tract_pop_0919_n[[1]] %>%
   mutate(GEOID = as.character(GEOID10)) %>%
   dplyr::select(-GEOID10) %>%
   dplyr::select(GEOID, n_00_10:n_80_Inf)
-# pop_origin00 * pop_pct00 / 100 
 
 
 wa_tract_pop_0919_df = wa_tract_pop_0919_n %>%
@@ -545,27 +535,14 @@ wa_tract_pop_0619_df =
 # total population
 wa_tract_pop_0619_total = 
   wa_tract_pop_0619_df %>%
-  #filter(year == 2009) %>%
-  #full_join(cw_or %>% mutate(GEOID00 = as.character(GEOID00)), by = c('GEOID' = 'GEOID00')) %>%
   group_by(GEOID, year) %>%
   summarize(tpop = sum(tpop)) %>%
-  #summarize_at(.vars = vars(tpop),
-  #             .funs = list(~floor(sum((. * POP00 * POPPCT00 / 100), na.rm = TRUE)/ sum(POP00 * POPPCT00 / 100, na.rm = TRUE)))) %>%
-  ungroup #%>%
+  ungroup 
 
-# wa_tract_pop_0619_total = wa_tract_pop_0619_df %>%
-#   filter(year >= 2010) %>%
-#   group_by(GEOID, year) %>%
-#   summarize(tpop = sum(tpop, na.rm = TRUE)) %>%
-#   ungroup %>%
-#   bind_rows(wa_tract_pop_0609_total %>% mutate(year = 2006),
-#             wa_tract_pop_0609_total %>% mutate(year = 2007),
-#             wa_tract_pop_0609_total %>% mutate(year = 2008),
-#             wa_tract_pop_0609_total %>% mutate(year = 2009),
-#             .) 
-  
 # tract data
-wa_tract = tigris::tracts(state = 'WA', year = 2010, refresh = T) %>%
+wa_tract = 
+  st_read("./Data/Basemap/ORWA_Tracts_2010.gpkg") %>%
+  filter(grepl('^53', GEOID10)) %>%
   rmapshaper::ms_simplify(keep = 0.33, keep_shapes = TRUE)
 wa_tract_lite = wa_tract %>%
   dplyr::select(GEOID10) %>%
@@ -581,16 +558,38 @@ wad_sf_tr_agecounts = wad_sf_tr %>%
   summarize(n_mental1 = sum(mental, na.rm = TRUE),
             n_mental3 = sum(mental3, na.rm = TRUE),
             n_mentaln = sum(mental_new, na.rm = TRUE),
+            n_mentaln2 = sum(mental_new2, na.rm = TRUE),
             n_moodanxiety = sum(moodanxiety, na.rm = TRUE),
-            n_substance = sum(substance, na.rm = TRUE)) %>%
+            n_substance = sum(substance, na.rm = TRUE),
+            n_nonsubstance = sum(nonsubstance, na.rm = TRUE),
+            n_nonsubstance2 = sum(nonsubstance2, na.rm = TRUE),
+            n_dementia_vas = sum(dementia_vascular, na.rm = TRUE),
+            n_dementia_uns = sum(dementia_unspecified, na.rm = TRUE)) %>%
   ungroup %>%
   mutate(agegroup = str_sub(agegroup, 2, nchar(agegroup)-1))
-  #pivot_wider(names_from = agegroup, names_prefix = 'dc', values_from = d_mental)
+wad_sf_tr_summary = wad_sf_tr %>%
+  st_drop_geometry %>%
+  mutate(dth_year = dth_yr) %>%
+  group_by(GEOID10, dth_year) %>%
+  summarize(n_mental1 = sum(mental, na.rm = TRUE),
+            n_mental3 = sum(mental3, na.rm = TRUE),
+            n_mentaln = sum(mental_new, na.rm = TRUE),
+            n_mentaln2 = sum(mental_new2, na.rm = TRUE),
+            n_moodanxiety = sum(moodanxiety, na.rm = TRUE),
+            n_substance = sum(substance, na.rm = TRUE),
+            n_nonsubstance = sum(nonsubstance, na.rm = TRUE),
+            n_nonsubstance2 = sum(nonsubstance2, na.rm = TRUE),
+            n_dementia_vas = sum(dementia_vascular, na.rm = TRUE),
+            n_dementia_uns = sum(dementia_unspecified, na.rm = TRUE),
+            n_meanage_nonsubstance2 = sum(age * nonsubstance2, na.rm = T) / sum(nonsubstance2, na.rm = T),
+            n_meanage_dementia_vas = sum(age * dementia_vascular, na.rm = T) / sum(dementia_vascular, na.rm = T),
+            n_meanage_dementia_uns = sum(age * dementia_unspecified, na.rm = T) / sum(dementia_unspecified, na.rm = T)) %>%
+  ungroup
 
 wa_tract_asmr_base = wa_tract_pop_0619_df %>%
   left_join(wad_sf_tr_agecounts, by = c('GEOID' = 'GEOID10', 'year' = 'dth_year', 'agegroup' = 'agegroup')) %>%
   left_join(pop_agestr, by = c('agegroup' = 'agegroup')) %>%
-  mutate_at(.vars = vars(n_mental1:n_substance),
+  mutate_at(.vars = vars(n_mental1:n_mentaln),
             .funs = list(~ifelse(is.na(.), 0, .))) %>%
   mutate(r_mental1_100k = 1e5 * (n_mental1 / tpop),
          r_mental3_100k = 1e5 * (n_mental3 / tpop),
@@ -618,7 +617,6 @@ wa_tract_n_gg = ggplot(wa_tract_n,
 wa_tract_asmr06 = wa_tract %>%
   left_join(wa_tract_asmr %>% filter(year == 2010),
             by = c('GEOID10' = 'GEOID'))
-#plot(wa_tract_asmr06 %>% filter(GEOID10 == '41067032300'))
 
 2006:2019 %>% 
   split(.,.) %>%
@@ -658,3 +656,160 @@ wa_tract_0619_df =
 orwa_tract_pop_0619_total = 
   bind_rows(or_tract_pop_0619_total         ,
             wa_tract_pop_0619_total)
+
+## Fix: mortality
+orwa_tr_summary = bind_rows(ord_sf_tr_summary, wad_sf_tr_summary)
+
+## More exploration
+p_load(dtplyr)
+
+ord_df = ord_sf_tr %>%
+    bind_cols(as_tibble(st_coordinates(.))) %>%
+    st_drop_geometry %>%
+    filter(mental_new >= 1) %>%
+    dplyr::select(ddodyear, caseid, GEOID10, starts_with('mltcse')) %>%
+    pivot_longer(cols = 4:23) %>%
+    filter(!is.na(value) & grepl("^F", value)) %>%
+    mutate(value = str_sub(value, 1, 2)) %>%
+    dplyr::select(-name) %>%
+    filter(GEOID10 == "41033361100") %>%
+    pivot_wider(names_from = value, values_fn = length)
+summary(ord_df)    
+
+# place type code
+ord_df = ord_sf_tr %>%
+    bind_cols(as_tibble(st_coordinates(.))) %>%
+    st_drop_geometry %>%
+    filter(mental_new >= 1) %>%
+    dplyr::select(ddodyear, caseid, GEOID10, dplacetypecode, starts_with('mltcse')) %>%
+    pivot_longer(cols = 5:24) %>%
+    filter(!is.na(value) & grepl("^F", value)) %>%
+    group_by(ddodyear, GEOID10, dplacetypecode) %>%
+    summarize(N = n()) %>%
+    ungroup %>%
+    pivot_wider(names_from = dplacetypecode, values_from = N) %>%
+    filter(GEOID10 == "41033361100")
+    
+    mutate(value = str_sub(value, 1, 2)) %>%
+    dplyr::select(-name) %>%
+    filter(GEOID10 == "41033361100") %>%
+    pivot_wider(names_from = value, values_fn = length)
+
+
+
+wad_df = wad_sf_tr %>%
+    bind_cols(as_tibble(st_coordinates(.))) %>%
+    st_drop_geometry %>%
+    filter(mental_new >= 1) %>%
+    dplyr::select(dth_yr, certno, GEOID10, starts_with('mltcse')) %>%
+    pivot_longer(cols = 4:23) %>%
+    group_by(caseid, GEOID10)
+
+
+
+## Nursing home
+nursing = st_read("./Data/NursingHomes_BusinessAnalyst.geojson")
+cenpop = read.csv("./Data/TotalPopulation_2010.csv") %>%
+    transmute(GEOID10 = str_sub(GEO_ID, 10, 20),
+              pop_ref = as.integer(P001001))
+
+
+wa_tract = tigris::tracts(state = 'WA', year = 2010, refresh = T) %>%
+    rmapshaper::ms_simplify(keep = 0.33, keep_shapes = TRUE)
+or_tract = tigris::tracts(state = 'OR', year = 2010, refresh = T) %>%
+    rmapshaper::ms_simplify(keep = 0.33, keep_shapes = TRUE)
+orwa_tract_lite = wa_tract %>%
+    rbind(or_tract) %>%
+    dplyr::select(GEOID10)
+nursing_join = nursing %>%
+    filter(STATE %in% c('OR', 'WA') & STATUS != "T") %>%
+    st_join(orwa_tract_lite) %>%
+    st_drop_geometry %>%
+    group_by(GEOID10) %>%
+    summarize(n_nursing = n(),
+              n_nursing_emp = sum(EMPNUM)) %>%
+    ungroup %>%
+    full_join(cenpop) %>%
+    mutate_at(.vars = vars(starts_with('n_nursing')),
+              .funs = list(~ifelse(is.na(.), 0, .))) %>%
+    mutate(d_nursing_10k = 1e4 * n_nursing / pop_ref,
+           d_nursing_emp_10k = 1e4 * n_nursing_emp / pop_ref)
+
+tracts = read_rds("./Data/ORWA_tracts_covariates.rds") %>%
+    left_join(nursing_join) %>%
+    mutate(State = ifelse(grepl('^41', GEOID10), 'Oregon', 'Washington'),
+           State = factor(State))
+write_rds(tracts, "./Data/ORWA_tracts_covariates.rds",
+          compress = 'xz', compression = 9)
+
+## Nursing home new
+wa_tract = tigris::tracts(state = 'WA', year = 2010, refresh = T) %>%
+    rmapshaper::ms_simplify(keep = 0.33, keep_shapes = TRUE)
+or_tract = tigris::tracts(state = 'OR', year = 2010, refresh = T) %>%
+    rmapshaper::ms_simplify(keep = 0.33, keep_shapes = TRUE)
+cenpop = read.csv("./Data/TotalPopulation_2010.csv") %>%
+    transmute(GEOID10 = str_sub(GEO_ID, 10, 20),
+              pop_ref = as.integer(P001001))
+
+orwa_tract_lite = wa_tract %>%
+    rbind(or_tract) %>%
+    dplyr::select(GEOID10)
+nursing = st_read("./Data/MentalHealthFacility/Senior_Facilities_052622.geojson")
+nursing_join = nursing %>%
+    st_transform(st_crs(orwa_tract_lite)) %>%
+    filter(STATE %in% c('OR', 'WA') & STATUS != "T") %>%
+    st_join(orwa_tract_lite) %>%
+    st_drop_geometry %>%
+    group_by(GEOID10) %>%
+    summarize(n_nursing = n(),
+              n_nursing_emp = sum(EMPNUM)) %>%
+    ungroup %>%
+    full_join(cenpop) %>%
+    mutate_at(.vars = vars(starts_with('n_nursing')),
+              .funs = list(~ifelse(is.na(.), 0, .))) %>%
+    mutate(d_nursing_10k = 1e4 * n_nursing / pop_ref,
+           d_nursing_emp_10k = 1e4 * n_nursing_emp / pop_ref)
+
+tracts = read_rds("./Data/ORWA_tracts_covariates.rds") %>%
+    dplyr::select(-all_of(colnames(nursing_join)[-1])) %>%
+    left_join(nursing_join) %>%
+    mutate(State = ifelse(grepl('^41', GEOID10), 'Oregon', 'Washington'),
+           State = factor(State))
+write_rds(tracts, "./Data/ORWA_tracts_covariates.rds",
+          compress = 'xz', compression = 9)
+
+### Medicare
+### Medicare webpage
+medi = read_csv("/mnt/c/Users/sigma/Downloads/Medicare_County.csv")
+uac_orwa = st_read("./Data/Urban/Census2010_UrbanArea.geojson")
+medi_orwa = medi %>% filter(grepl("^(41|53)", BENE_GEO_CD) & nchar(BENE_GEO_CD) > 3) %>%
+    transmute(GEOID10 = BENE_GEO_CD,
+              year = YEAR,
+              n_std_ra_payment_capita = TOT_MDCR_STDZD_RA_PYMT_PC,
+              n_std_nurs_payment_user = SNF_MDCR_STDZD_PYMT_PER_USER,
+              n_std_irf_payment_user = IRF_MDCR_STDZD_PYMT_PER_USER,
+              n_std_home_payment_user = HH_MDCR_STDZD_PYMT_PER_USER) %>%
+    mutate_at(.vars = vars(starts_with("n_std")), .funs = list(~as.numeric(.))) 
+medi_orwa %>% filter_all(.vars_predicate = any_vars(.=="*"))
+tracts = read_rds("./Data/ORWA_tracts_covariates.rds") %>%
+    mutate(CNTY_FIPS = str_sub(GEOID10, 1, 5)) %>%
+    left_join(medi_orwa, by = c('CNTY_FIPS' = 'GEOID10', 'year' = 'year')) %>%
+    arrange(GEOID10, year) %>%
+    group_by(GEOID10) %>%
+    mutate(n_std_ra_payment_capita = ifelse(is.na(n_std_ra_payment_capita), n_std_ra_payment_capita[2], n_std_ra_payment_capita)) %>%
+    ungroup
+tracts10 = tracts %>% filter(year == 2010) %>%
+    st_join(uac_orwa %>% dplyr::select(UACE10), largest =T) %>%
+    mutate(urban_census = factor(ifelse(is.na(UACE10), "NonUrban", "Urban"))) %>%
+    st_drop_geometry %>%
+    dplyr::select(GEOID10, urban_census)
+tracts_ex = tracts %>%
+    left_join(tracts10) %>%
+    mutate(n_std_ra_payment_capita10 = CPI10 * n_std_ra_payment_capita) 
+write_rds(tracts_ex, "./Data/ORWA_tracts_covariates.rds",
+          compress = 'xz', compression = 9)
+
+censusurban_ = censusurban %>% st_transform(st_crs(tracts))
+uac_orwa = censusurban_[tracts,]
+
+### End of file ####
